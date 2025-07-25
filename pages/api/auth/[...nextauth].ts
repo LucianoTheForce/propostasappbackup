@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 import { createClient } from '@supabase/supabase-js'
 
 // Create Supabase client with service role for auth
@@ -16,6 +17,10 @@ const supabaseAdmin = createClient(
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -114,10 +119,74 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'google') {
+        try {
+          // Check if user exists in our users table
+          const { data: existingUser, error: fetchError } = await supabaseAdmin
+            .from('users')
+            .select('*')
+            .eq('email', user.email!)
+            .single()
+
+          if (fetchError && fetchError.code !== 'PGRST116') {
+            console.error('Error fetching user:', fetchError)
+            return false
+          }
+
+          // If user doesn't exist, create them
+          if (!existingUser) {
+            // Check if this is the first user
+            const { count } = await supabaseAdmin
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+
+            const isFirstUser = count === 0
+
+            const { error: createError } = await supabaseAdmin
+              .from('users')
+              .insert({
+                id: user.id,
+                email: user.email!,
+                name: user.name || user.email!.split('@')[0],
+                role: isFirstUser ? 'admin' : 'user',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+
+            if (createError) {
+              console.error('Error creating user:', createError)
+              return false
+            }
+          }
+
+          return true
+        } catch (error) {
+          console.error('SignIn error:', error)
+          return false
+        }
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
+      if (account?.provider === 'google' && user) {
+        // Fetch user role from database
+        const { data: userData } = await supabaseAdmin
+          .from('users')
+          .select('role')
+          .eq('email', user.email!)
+          .single()
+
+        if (userData) {
+          token.role = userData.role
+        }
+      }
+      
       if (user) {
         token.id = user.id
-        token.role = (user as any).role
+        if ((user as any).role) {
+          token.role = (user as any).role
+        }
       }
       return token
     },
