@@ -9,7 +9,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(npm run lint)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }

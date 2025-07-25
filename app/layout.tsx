@@ -1,11 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
-import { LanguageProvider } from "@/contexts/language-context"
+import { Providers } from "@/components/providers"
 
 export const metadata: Metadata = {
-  title: "THE FORCE | ALMA 2026 - Visual Identity & Club Room Design",
-  description: "Proposal for visual identity and club room design for ALMA 2026",
+  title: "THE FORCE | Proposal Management System",
+  description: "Proposal management system for THE FORCE creative agency",
   generator: 'v0.dev'
 }
 
@@ -17,9 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans">
-        <LanguageProvider>
+        <Providers>
           {children}
-        </LanguageProvider>
+        </Providers>
       </body>
     </html>
   )
