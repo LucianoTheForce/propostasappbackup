@@ -28,6 +28,19 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        // TEMPORARY BYPASS - REMOVE IN PRODUCTION
+        if (process.env.AUTH_BYPASS === 'true' && 
+            credentials.email === 'admin@theforce.cc' && 
+            credentials.password === 'admin123') {
+          console.log('Using auth bypass for admin@theforce.cc')
+          return {
+            id: 'bypass-admin-id',
+            email: 'admin@theforce.cc',
+            name: 'Admin (Bypass)',
+            role: 'admin'
+          }
+        }
+
         try {
           // Try to sign in with Supabase Auth
           const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
