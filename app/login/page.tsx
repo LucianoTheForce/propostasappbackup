@@ -1,18 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Lock, ArrowRight } from 'lucide-react'
 import { AdvancedTextAnimation } from '@/components/advanced-text-animation'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccessMessage('Conta criada com sucesso! Faça login para continuar.')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,6 +104,16 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {successMessage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-green-500 text-sm"
+            >
+              {successMessage}
+            </motion.div>
+          )}
+
           {error && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -119,6 +138,15 @@ export default function LoginPage() {
               </>
             )}
           </button>
+
+          <div className="mt-6 text-center">
+            <p className="text-white/60 text-sm">
+              Não tem uma conta?{' '}
+              <Link href="/register" className="text-white hover:underline">
+                Criar conta
+              </Link>
+            </p>
+          </div>
         </form>
       </motion.div>
     </div>
