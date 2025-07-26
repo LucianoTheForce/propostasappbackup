@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         value: parseFloat(value) || 0,
         slug,
         content_json,
-        created_by: 'admin-user', // Hardcoded admin user
+        // created_by will be null for now until auth is implemented
         status: 'draft',
         version: 1
       })

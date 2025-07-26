@@ -58,10 +58,8 @@ export default function EditProposalPage({ params }: { params: { slug: string } 
   const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
-    if (session) {
-      fetchProposal()
-    }
-  }, [session, params.slug])
+    fetchProposal()
+  }, [params.slug])
 
   const fetchProposal = async () => {
     try {
