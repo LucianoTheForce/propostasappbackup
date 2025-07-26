@@ -1,12 +1,68 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
+// UUID padrão para sistema sem autenticação
+const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000001'
+
+async function ensureSystemUser() {
+  try {
+    const supabase = getSupabaseAdmin()
+    
+    // Verificar se o usuário sistema existe
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', SYSTEM_USER_ID)
+      .single()
+    
+    if (existingUser) {
+      return SYSTEM_USER_ID
+    }
+
+    // Criar usuário sistema se não existir
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        id: SYSTEM_USER_ID,
+        email: 'system@theforce.cc',
+        name: 'Sistema THE FORCE',
+        role: 'admin'
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Erro ao criar usuário sistema:', error)
+      return null
+    }
+
+    console.log('✅ Usuário sistema criado:', newUser)
+    return SYSTEM_USER_ID
+    
+  } catch (error) {
+    console.error('Erro na função ensureSystemUser:', error)
+    return null
+  }
+}
+
 // Força a criação de propostas removendo todas as políticas e constraints
 export async function POST() {
   try {
     console.log('🚀 FORCE SEED: Iniciando processo forçado de seed...')
     
     const supabase = getSupabaseAdmin()
+    
+    // Garantir usuário sistema
+    console.log('👤 Criando/verificando usuário sistema...')
+    const systemUserId = await ensureSystemUser()
+    
+    if (!systemUserId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Não foi possível criar usuário sistema',
+        message: 'Processo interrompido'
+      }, { status: 500 })
+    }
     
     // Dados simplificados para garantir inserção
     const testProposals = [
@@ -17,7 +73,7 @@ export async function POST() {
         slug: 'teste-alma-2026-identidade-visual-completa',
         status: 'sent',
         version: 1,
-        created_by: null,
+        created_by: systemUserId,
         content_json: {
           title: "THE FORCE",
           subtitle: "X THE FORCE",
@@ -33,7 +89,7 @@ export async function POST() {
         slug: 'branding-technova-solucao-corporativa',
         status: 'approved',
         version: 2,
-        created_by: null,
+        created_by: systemUserId,
         content_json: {
           title: "THE FORCE",
           subtitle: "X THE FORCE", 
@@ -49,7 +105,7 @@ export async function POST() {
         slug: 'identidade-ecoverde-sustentabilidade', 
         status: 'viewed',
         version: 1,
-        created_by: null,
+        created_by: systemUserId,
         content_json: {
           title: "THE FORCE",
           subtitle: "X THE FORCE",

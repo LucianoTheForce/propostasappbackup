@@ -1,6 +1,50 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
+// UUID padrão para sistema sem autenticação
+const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000001'
+
+async function ensureSystemUser() {
+  try {
+    const supabase = getSupabaseAdmin()
+    
+    // Verificar se o usuário sistema existe
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', SYSTEM_USER_ID)
+      .single()
+    
+    if (existingUser) {
+      return SYSTEM_USER_ID
+    }
+
+    // Criar usuário sistema se não existir
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        id: SYSTEM_USER_ID,
+        email: 'system@theforce.cc',
+        name: 'Sistema THE FORCE',
+        role: 'admin'
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Erro ao criar usuário sistema:', error)
+      return null
+    }
+
+    console.log('✅ Usuário sistema criado:', newUser)
+    return SYSTEM_USER_ID
+    
+  } catch (error) {
+    console.error('Erro na função ensureSystemUser:', error)
+    return null
+  }
+}
+
 const getComprehensiveProposalData = (name: string, client: string, value: number, index: number) => ({
   title: "THE FORCE",
   subtitle: "X THE FORCE",
@@ -100,7 +144,6 @@ const sampleProposals = [
     slug: 'rebranding-corporativo-technova-solutions',
     status: 'approved',
     version: 3,
-    created_by: null,
   },
   {
     name: 'Identidade Visual - EcoVerde Sustentabilidade',
@@ -109,7 +152,6 @@ const sampleProposals = [
     slug: 'identidade-visual-ecoverde-sustentabilidade',
     status: 'sent',
     version: 2,
-    created_by: null,
   },
   {
     name: 'Branding Completo - FitLife Academia Premium',
@@ -118,7 +160,6 @@ const sampleProposals = [
     slug: 'branding-completo-fitlife-academia-premium',
     status: 'viewed',
     version: 1,
-    created_by: null,
   },
   {
     name: 'Identidade Visual - Artesã Brasil Marketplace',
@@ -127,7 +168,6 @@ const sampleProposals = [
     slug: 'identidade-visual-artesa-brasil-marketplace',
     status: 'draft',
     version: 1,
-    created_by: null,
   },
   {
     name: 'Rebranding - StartupHub Incubadora Digital',
@@ -136,7 +176,6 @@ const sampleProposals = [
     slug: 'rebranding-startuphub-incubadora-digital',
     status: 'rejected',
     version: 2,
-    created_by: null,
   },
   {
     name: 'Identidade Corporativa - EduTech Educação Digital',
@@ -145,7 +184,6 @@ const sampleProposals = [
     slug: 'identidade-corporativa-edutech-educacao-digital',
     status: 'approved',
     version: 4,
-    created_by: null,
   },
   {
     name: 'Visual Identity - ALMA 2026 Club Experience',
@@ -154,7 +192,6 @@ const sampleProposals = [
     slug: 'visual-identity-alma-2026-club-experience',
     status: 'sent',
     version: 1,
-    created_by: null,
   },
   {
     name: 'Branding Premium - RestaurantePlus Gastronomia',
@@ -163,7 +200,6 @@ const sampleProposals = [
     slug: 'branding-premium-restauranteplus-gastronomia',
     status: 'viewed',
     version: 1,
-    created_by: null,
   }
 ]
 
@@ -172,6 +208,18 @@ export async function POST() {
     console.log('🚀 Iniciando processo de seed...')
     
     const supabase = getSupabaseAdmin()
+    
+    // Garantir usuário sistema
+    console.log('👤 Criando/verificando usuário sistema...')
+    const systemUserId = await ensureSystemUser()
+    
+    if (!systemUserId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Não foi possível criar usuário sistema',
+        message: 'Processo interrompido'
+      }, { status: 500 })
+    }
     
     // Primeiro, vamos limpar propostas existentes
     console.log('🧹 Limpando propostas existentes...')
@@ -189,6 +237,7 @@ export async function POST() {
     // Preparar dados com content_json completo
     const proposalsWithContent = sampleProposals.map((proposal, index) => ({
       ...proposal,
+      created_by: systemUserId,
       content_json: getComprehensiveProposalData(proposal.name, proposal.client, proposal.value, index)
     }))
 
