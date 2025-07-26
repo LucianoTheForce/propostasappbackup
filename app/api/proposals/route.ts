@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { supabase } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { data, error } = await supabase
       .from('proposals')
       .select('*')
@@ -29,11 +22,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const body = await request.json()
     const { name, client, value, content_json } = body
 
@@ -51,7 +39,7 @@ export async function POST(request: NextRequest) {
         value: parseFloat(value) || 0,
         slug,
         content_json,
-        created_by: session.user.id,
+        created_by: 'admin-user', // Hardcoded admin user
         status: 'draft',
         version: 1
       })
