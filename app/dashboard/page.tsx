@@ -66,8 +66,14 @@ export default function DashboardPage() {
     try {
       console.log('📥 Buscando propostas...')
       
-      // Sempre usar mock primeiro para garantir que funcione
-      const response = await fetch('/api/proposals-mock')
+      // Tentar primeiro a API normal
+      let response = await fetch('/api/proposals')
+      
+      if (!response.ok) {
+        console.log('🔄 API normal falhou, usando mock...')
+        // Se falhar, usar API mock
+        response = await fetch('/api/proposals-mock')
+      }
       
       if (!response.ok) {
         throw new Error('Failed to fetch proposals')
@@ -82,12 +88,13 @@ export default function DashboardPage() {
       setProposals([
         {
           id: '1',
-          name: 'Visual Identity - ALMA 2026',
+          name: 'Visual Identity - ALMA 2026 Club Experience',
           client: 'ALMA 2026',
           value: 275000,
           status: 'sent',
           created_at: '2025-01-15T10:00:00Z',
-          slug: 'visual-identity-alma-2026'
+          slug: 'visual-identity-alma-2026-club-experience',
+          version: 1
         }
       ])
     } finally {
