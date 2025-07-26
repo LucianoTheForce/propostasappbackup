@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Plus, Search, Filter, Download, Eye, Edit2, MoreVertical } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -43,7 +42,6 @@ const statusLabels = {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,12 +49,8 @@ export default function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login')
-    } else if (status === 'authenticated') {
-      fetchProposals()
-    }
-  }, [status, router])
+    fetchProposals()
+  }, [])
 
   const fetchProposals = async () => {
     try {
@@ -85,7 +79,7 @@ export default function DashboardPage() {
   const approvedCount = proposals.filter(p => p.status === 'approved').length
   const approvalRate = proposals.length > 0 ? (approvedCount / proposals.length) * 100 : 0
 
-  if (status === 'loading' || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="animate-pulse">Loading...</div>
@@ -104,88 +98,104 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-white/60">
-              {session?.user?.name || session?.user?.email}
+              Admin User
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push('/api/auth/signout')}
-            >
-              Sign Out
-            </Button>
           </div>
         </div>
       </header>
 
       {/* Stats */}
-      <div className="px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 border border-white/10 rounded-lg p-6"
-          >
-            <div className="text-sm text-white/60 mb-2">Total Proposals</div>
-            <div className="text-3xl font-bold">{proposals.length}</div>
-          </motion.div>
+      <div className="px-6 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/5 border border-white/10 rounded-lg p-6"
+            className="bg-white/5 border border-white/10 rounded-lg p-4"
           >
-            <div className="text-sm text-white/60 mb-2">Total Value</div>
-            <div className="text-3xl font-bold">
-              R$ {totalValue.toLocaleString('pt-BR')}
-            </div>
+            <p className="text-sm text-white/60 mb-1">Total Propostas</p>
+            <p className="text-2xl font-bold">{proposals.length}</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/5 border border-white/10 rounded-lg p-6"
+            className="bg-white/5 border border-white/10 rounded-lg p-4"
           >
-            <div className="text-sm text-white/60 mb-2">Approved</div>
-            <div className="text-3xl font-bold">{approvedCount}</div>
+            <p className="text-sm text-white/60 mb-1">Valor Total</p>
+            <p className="text-2xl font-bold">
+              R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white/5 border border-white/10 rounded-lg p-6"
+            className="bg-white/5 border border-white/10 rounded-lg p-4"
           >
-            <div className="text-sm text-white/60 mb-2">Approval Rate</div>
-            <div className="text-3xl font-bold">{approvalRate.toFixed(1)}%</div>
+            <p className="text-sm text-white/60 mb-1">Taxa de Aprovação</p>
+            <p className="text-2xl font-bold">{approvalRate.toFixed(0)}%</p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white/5 border border-white/10 rounded-lg p-4"
+          >
+            <p className="text-sm text-white/60 mb-1">Aprovadas</p>
+            <p className="text-2xl font-bold text-green-500">{approvedCount}</p>
           </motion.div>
         </div>
 
         {/* Actions Bar */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
-            <Input
-              placeholder="Search proposals..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white/5 border-white/10 text-white"
-            />
-          </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+          <Button
+            onClick={() => router.push('/proposals/new')}
+            className="bg-white text-black hover:bg-white/90"
           >
-            <option value="all">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="sent">Sent</option>
-            <option value="viewed">Viewed</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <Button onClick={() => router.push('/proposals/new')} className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Proposal
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Proposta
           </Button>
+          <div className="flex-1 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Input
+                type="text"
+                placeholder="Buscar propostas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="border-white/10">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filtrar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+                  Todas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('draft')}>
+                  Rascunho
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('sent')}>
+                  Enviada
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('viewed')}>
+                  Visualizada
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('approved')}>
+                  Aprovada
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter('rejected')}>
+                  Reprovada
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Table */}
@@ -193,13 +203,12 @@ export default function DashboardPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-white/10">
-                <TableHead className="text-white">Name</TableHead>
-                <TableHead className="text-white">Client</TableHead>
-                <TableHead className="text-white">Date Sent</TableHead>
-                <TableHead className="text-white">Status</TableHead>
-                <TableHead className="text-white">Version</TableHead>
-                <TableHead className="text-white">Value</TableHead>
-                <TableHead className="text-white text-right">Actions</TableHead>
+                <TableHead className="text-white/60">Proposta</TableHead>
+                <TableHead className="text-white/60">Cliente</TableHead>
+                <TableHead className="text-white/60">Valor</TableHead>
+                <TableHead className="text-white/60">Status</TableHead>
+                <TableHead className="text-white/60">Data</TableHead>
+                <TableHead className="text-white/60 text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -208,17 +217,19 @@ export default function DashboardPage() {
                   <TableCell className="font-medium">{proposal.name}</TableCell>
                   <TableCell>{proposal.client}</TableCell>
                   <TableCell>
-                    {proposal.date_sent
-                      ? format(new Date(proposal.date_sent), 'dd/MM/yyyy', { locale: ptBR })
-                      : '-'}
+                    R$ {proposal.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
-                    <Badge className={`${statusColors[proposal.status]} text-white`}>
+                    <Badge
+                      variant="secondary"
+                      className={`${statusColors[proposal.status]} text-white border-0`}
+                    >
                       {statusLabels[proposal.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell>v{proposal.version}</TableCell>
-                  <TableCell>R$ {proposal.value.toLocaleString('pt-BR')}</TableCell>
+                  <TableCell>
+                    {format(new Date(proposal.created_at), 'dd/MM/yyyy', { locale: ptBR })}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -226,24 +237,18 @@ export default function DashboardPage() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-black border-white/10">
-                        <DropdownMenuItem
-                          onClick={() => window.open(`/proposals/${proposal.slug}`, '_blank')}
-                          className="text-white hover:bg-white/10"
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push(`/proposals/${proposal.slug}`)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => router.push(`/proposals/${proposal.slug}/edit`)}
-                          className="text-white hover:bg-white/10"
-                        >
-                          <Edit2 className="mr-2 h-4 w-4" />
-                          Edit
+                        <DropdownMenuItem onClick={() => router.push(`/proposals/${proposal.slug}/edit`)}>
+                          <Edit2 className="h-4 w-4 mr-2" />
+                          Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-white hover:bg-white/10">
-                          <Download className="mr-2 h-4 w-4" />
-                          Export PDF
+                        <DropdownMenuItem>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download PDF
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

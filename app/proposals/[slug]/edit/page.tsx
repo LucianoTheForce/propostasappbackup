@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { supabase, type Proposal } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import Draggable from 'react-draggable'
@@ -41,7 +40,6 @@ interface ChatMessage {
 
 export default function EditProposalPage({ params }: { params: { slug: string } }) {
   const router = useRouter()
-  const { data: session } = useSession()
   const [proposal, setProposal] = useState<Proposal | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
