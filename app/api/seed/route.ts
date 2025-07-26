@@ -9,9 +9,14 @@ const sampleProposals = [
     slug: 'rebranding-corporativo-technova',
     status: 'approved',
     version: 3,
+    created_by: null,
     content_json: {
-      hero: { title: 'Rebranding Corporativo TechNova', subtitle: 'Nova identidade para nova era digital' },
-      description: 'Projeto completo de rebranding incluindo logo, identidade visual, site e materiais impressos.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "Rebranding Corporativo - TechNova",
+      clientName: "TechNova Solutions",
+      projectDescription: "Projeto completo de rebranding incluindo logo, identidade visual, site e materiais impressos para uma nova era digital.",
+      brandPersonality: ["Tech", "Inovador", "Moderno", "Confiável"]
     }
   },
   {
@@ -21,9 +26,14 @@ const sampleProposals = [
     slug: 'campanha-digital-ecoverde',
     status: 'sent',
     version: 2,
+    created_by: null,
     content_json: {
-      hero: { title: 'Campanha Digital EcoVerde', subtitle: 'Comunicação sustentável para um mundo melhor' },
-      description: 'Estratégia de marketing digital focada em sustentabilidade e consciência ambiental.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "Campanha Digital - EcoVerde",
+      clientName: "EcoVerde Sustentabilidade",
+      projectDescription: "Estratégia de marketing digital focada em sustentabilidade e consciência ambiental para um mundo melhor.",
+      brandPersonality: ["Sustentável", "Verde", "Consciente", "Natural"]
     }
   },
   {
@@ -33,9 +43,14 @@ const sampleProposals = [
     slug: 'app-mobile-fitlife',
     status: 'viewed',
     version: 1,
+    created_by: null,
     content_json: {
-      hero: { title: 'App Mobile FitLife', subtitle: 'Tecnologia a serviço da sua saúde' },
-      description: 'Desenvolvimento de aplicativo mobile para gestão de treinos e nutrição.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "App Mobile - FitLife",
+      clientName: "FitLife Academia",
+      projectDescription: "Desenvolvimento de aplicativo mobile para gestão de treinos e nutrição, colocando tecnologia a serviço da sua saúde.",
+      brandPersonality: ["Fitness", "Energia", "Saúde", "Motivação"]
     }
   },
   {
@@ -45,9 +60,14 @@ const sampleProposals = [
     slug: 'ecommerce-artesa-brasil',
     status: 'draft',
     version: 1,
+    created_by: null,
     content_json: {
-      hero: { title: 'E-commerce Artesã Brasil', subtitle: 'Conectando artesãos ao mundo digital' },
-      description: 'Plataforma de e-commerce para venda de artesanatos brasileiros.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "E-commerce - Artesã Brasil",
+      clientName: "Artesã Brasil",
+      projectDescription: "Plataforma de e-commerce conectando artesãos brasileiros ao mundo digital, valorizando a cultura nacional.",
+      brandPersonality: ["Artesanal", "Brasileiro", "Autêntico", "Cultural"]
     }
   },
   {
@@ -57,9 +77,14 @@ const sampleProposals = [
     slug: 'identidade-visual-startuphub',
     status: 'rejected',
     version: 2,
+    created_by: null,
     content_json: {
-      hero: { title: 'Identidade Visual StartupHub', subtitle: 'Inovação visual para inovadores' },
-      description: 'Criação de identidade visual para incubadora de startups.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "Identidade Visual - StartupHub",
+      clientName: "StartupHub Incubadora",
+      projectDescription: "Criação de identidade visual inovadora para incubadora de startups, com foco em inovação e crescimento.",
+      brandPersonality: ["Inovador", "Startup", "Crescimento", "Tecnológico"]
     }
   },
   {
@@ -69,9 +94,14 @@ const sampleProposals = [
     slug: 'portal-educacional-edutech',
     status: 'approved',
     version: 4,
+    created_by: null,
     content_json: {
-      hero: { title: 'Portal Educacional EduTech', subtitle: 'O futuro da educação é digital' },
-      description: 'Plataforma educacional online com recursos interativos e gamificação.'
+      title: "THE FORCE",
+      subtitle: "X THE FORCE",
+      proposalTitle: "Portal Educacional - EduTech",
+      clientName: "EduTech Educação",
+      projectDescription: "Plataforma educacional online com recursos interativos e gamificação, representando o futuro da educação digital.",
+      brandPersonality: ["Educacional", "Interativo", "Futuro", "Aprendizado"]
     }
   }
 ]
