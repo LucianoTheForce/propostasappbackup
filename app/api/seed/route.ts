@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 const sampleProposals = [
   {
@@ -109,7 +109,7 @@ const sampleProposals = [
 export async function POST() {
   try {
     // Clear existing proposals first
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('proposals')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
@@ -119,7 +119,7 @@ export async function POST() {
     }
 
     // Insert sample proposals
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('proposals')
       .insert(sampleProposals)
       .select()

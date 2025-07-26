@@ -29,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { supabaseAdmin, type Proposal } from '@/lib/supabase'
+import { type Proposal } from '@/lib/supabase'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -64,12 +64,13 @@ export default function DashboardPage() {
 
   const fetchProposals = async () => {
     try {
-      const { data, error } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
+      const response = await fetch('/api/proposals')
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch proposals')
+      }
+      
+      const data = await response.json()
       setProposals(data || [])
     } catch (error) {
       console.error('Error fetching proposals:', error)
