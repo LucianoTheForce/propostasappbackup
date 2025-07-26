@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import DynamicProposalTemplate from '@/components/dynamic-proposal-template'
 
 // Default content structure to ensure all fields exist
@@ -80,7 +80,7 @@ const getDefaultContent = (proposalData: any) => ({
 
 export default async function ProposalPage({ params }: { params: { slug: string } }) {
   // Fetch proposal data from Supabase
-  const { data: proposal, error } = await supabase
+  const { data: proposal, error } = await supabaseAdmin
     .from('proposals')
     .select('*')
     .eq('slug', params.slug)
@@ -92,7 +92,7 @@ export default async function ProposalPage({ params }: { params: { slug: string 
 
   // Track view if not already viewed
   if (proposal.status === 'sent') {
-    await supabase
+    await supabaseAdmin
       .from('proposals')
       .update({ status: 'viewed' })
       .eq('id', proposal.id)

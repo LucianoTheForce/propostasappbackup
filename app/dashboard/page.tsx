@@ -29,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { supabase, type Proposal } from '@/lib/supabase'
+import { supabaseAdmin, type Proposal } from '@/lib/supabase'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -64,7 +64,7 @@ export default function DashboardPage() {
 
   const fetchProposals = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .order('created_at', { ascending: false })

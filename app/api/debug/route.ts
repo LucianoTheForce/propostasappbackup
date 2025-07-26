@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   try {
     // Try to access the database bypassing RLS
-    const { data, error, count } = await supabase
+    const { data, error, count } = await supabaseAdmin
       .from('proposals')
       .select('id, name, client, status, created_at', { count: 'exact' })
       .limit(1)
@@ -45,7 +45,7 @@ export async function POST() {
       }
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('proposals')
       .insert(testProposal)
       .select()
