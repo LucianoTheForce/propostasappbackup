@@ -53,15 +53,10 @@ function LoginForm() {
     signIn('google', { callbackUrl: '/' })
   }
 
-  const handleBypassLogin = async () => {
+  const handleBypassLogin = () => {
     setLoading(true)
-    await signIn('credentials', {
-      email: 'admin@theforce.cc',
-      password: 'admin123',
-      redirect: false,
-    })
-    router.push('/')
-    router.refresh()
+    // Redirect directly to dashboard without authentication
+    router.push('/dashboard')
   }
 
   return (
