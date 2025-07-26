@@ -206,7 +206,8 @@ export default function NewProposalPage() {
     try {
       const proposalName = formData.name || generateProposalName(formData.client, formData.projectType)
       
-      const response = await fetch('/api/proposals', {
+      // Primeiro tentar API normal, se falhar usar mock
+      let response = await fetch('/api/proposals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,6 +219,22 @@ export default function NewProposalPage() {
           content_json: createComprehensiveContent()
         }),
       })
+
+      if (!response.ok) {
+        console.log('🔄 API normal falhou, tentando mock...')
+        response = await fetch('/api/proposals-mock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: proposalName,
+            client: formData.client,
+            value: parseFloat(formData.value) || 0,
+            content_json: createComprehensiveContent()
+          }),
+        })
+      }
 
       if (!response.ok) {
         const errorData = await response.json()

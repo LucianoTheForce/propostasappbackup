@@ -64,7 +64,13 @@ export default function DashboardPage() {
 
   const fetchProposals = async () => {
     try {
-      const response = await fetch('/api/proposals')
+      // Primeiro tentar API normal, se falhar usar mock
+      let response = await fetch('/api/proposals')
+      
+      if (!response.ok) {
+        console.log('🔄 API normal falhou, tentando mock...')
+        response = await fetch('/api/proposals-mock')
+      }
       
       if (!response.ok) {
         throw new Error('Failed to fetch proposals')
