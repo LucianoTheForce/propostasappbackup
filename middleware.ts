@@ -1,3 +1,7 @@
+// TEMPORARILY DISABLED FOR DEVELOPMENT
+// Uncomment the code below to enable authentication
+
+/*
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 
@@ -31,4 +35,14 @@ export const config = {
     '/proposals/new',
     '/proposals/:slug/edit',
   ],
+}
+*/
+
+// Temporary bypass - no authentication required
+export default function middleware() {
+  // Allow all requests
+}
+
+export const config = {
+  matcher: []
 }
