@@ -94,8 +94,6 @@ const MuxVideo = ({ playbackId }: { playbackId: string }) => {
       thumbnailTime={1}
       preferPlayback="mse" // Prefer MSE over HLS when available
       maxResolution="720p" // Limit resolution to reduce bandwidth
-      minBufferDuration={2} // Minimum buffer in seconds
-      maxBufferDuration={30} // Maximum buffer in seconds
       style={{ height: "100%", width: "100%", objectFit: "cover" }}
       onError={handleError}
       onLoadStart={() => console.log("Mux video load started")}

@@ -90,11 +90,16 @@ export default function DashboardPage() {
           id: '1',
           name: 'Visual Identity - ALMA 2026 Club Experience',
           client: 'ALMA 2026',
+          client_id: null,
           value: 275000,
-          status: 'sent',
+          status: 'sent' as const,
           created_at: '2025-01-15T10:00:00Z',
+          updated_at: '2025-01-15T10:00:00Z',
           slug: 'visual-identity-alma-2026-club-experience',
-          version: 1
+          version: 1,
+          date_sent: '2025-01-15T10:00:00Z',
+          content_json: {},
+          created_by: null
         }
       ])
     } finally {

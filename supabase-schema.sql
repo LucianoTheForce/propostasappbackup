@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.proposals (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   slug TEXT UNIQUE NOT NULL,
   content_json JSONB,
-  created_by UUID NOT NULL REFERENCES public.users(id)
+  created_by UUID REFERENCES public.users(id)
 );
 
 -- Proposal versions table
@@ -96,6 +96,29 @@ DROP POLICY IF EXISTS "Admins and editors can manage proposals" ON public.propos
 DROP POLICY IF EXISTS "Authenticated users can view proposal versions" ON public.proposal_versions;
 DROP POLICY IF EXISTS "Users can manage own chat history" ON public.ai_chat_history;
 
+-- Create system user function
+CREATE OR REPLACE FUNCTION create_system_user_if_not_exists()
+RETURNS UUID AS $$
+DECLARE
+    system_user_id UUID := '00000000-0000-0000-0000-000000000001';
+BEGIN
+    -- Check if system user exists
+    IF NOT EXISTS (SELECT 1 FROM public.users WHERE id = system_user_id) THEN
+        -- Create system user
+        INSERT INTO public.users (id, email, name, role, created_at)
+        VALUES (
+            system_user_id,
+            'system@alma2026.com',
+            'Sistema ALMA 2026',
+            'admin',
+            NOW()
+        );
+    END IF;
+    
+    RETURN system_user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Users policies
 CREATE POLICY "Users can view own profile" ON public.users
   FOR SELECT USING (auth.uid() = id);
@@ -111,6 +134,10 @@ CREATE POLICY "Admins can view all users" ON public.users
 CREATE POLICY "Users can insert themselves" ON public.users
   FOR INSERT WITH CHECK (auth.uid() = id);
 
+-- Allow service role to manage users
+CREATE POLICY "Service role can manage users" ON public.users
+  FOR ALL USING (current_setting('role') = 'service_role');
+
 -- Clients policies
 CREATE POLICY "Authenticated users can view clients" ON public.clients
   FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -123,9 +150,13 @@ CREATE POLICY "Admins and editors can manage clients" ON public.clients
     )
   );
 
+-- Allow service role to manage clients
+CREATE POLICY "Service role can manage clients" ON public.clients
+  FOR ALL USING (current_setting('role') = 'service_role');
+
 -- Proposals policies
-CREATE POLICY "Authenticated users can view proposals" ON public.proposals
-  FOR SELECT USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Public can view proposals" ON public.proposals
+  FOR SELECT USING (true);
 
 CREATE POLICY "Admins and editors can manage proposals" ON public.proposals
   FOR ALL USING (
@@ -135,9 +166,20 @@ CREATE POLICY "Admins and editors can manage proposals" ON public.proposals
     )
   );
 
+-- Allow service role to manage proposals
+CREATE POLICY "Service role can manage proposals" ON public.proposals
+  FOR ALL USING (current_setting('role') = 'service_role');
+
+-- Allow system operations for proposals
+CREATE POLICY "System can manage proposals" ON public.proposals
+  FOR ALL USING (
+    created_by = '00000000-0000-0000-0000-000000000001' OR
+    created_by IS NULL
+  );
+
 -- Proposal versions policies
-CREATE POLICY "Authenticated users can view proposal versions" ON public.proposal_versions
-  FOR SELECT USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Public can view proposal versions" ON public.proposal_versions
+  FOR SELECT USING (true);
 
 CREATE POLICY "Admins and editors can manage proposal versions" ON public.proposal_versions
   FOR ALL USING (
@@ -146,6 +188,10 @@ CREATE POLICY "Admins and editors can manage proposal versions" ON public.propos
       WHERE id = auth.uid() AND role IN ('admin', 'editor')
     )
   );
+
+-- Allow service role to manage proposal versions
+CREATE POLICY "Service role can manage proposal versions" ON public.proposal_versions
+  FOR ALL USING (current_setting('role') = 'service_role');
 
 -- AI chat history policies
 CREATE POLICY "Users can manage own chat history" ON public.ai_chat_history
@@ -156,3 +202,7 @@ CREATE POLICY "Users can manage own chat history" ON public.ai_chat_history
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
+
+-- Allow service role to manage chat history
+CREATE POLICY "Service role can manage chat history" ON public.ai_chat_history
+  FOR ALL USING (current_setting('role') = 'service_role');
