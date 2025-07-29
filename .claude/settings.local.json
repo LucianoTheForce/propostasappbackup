@@ -18,7 +18,13 @@
       "Bash(curl:*)",
       "Bash(git push:*)",
       "Bash(rg:*)",
-      "Bash(vercel)"
+      "Bash(vercel)",
+      "Bash(vercel:*)",
+      "Bash(npm run build:*)",
+      "Bash(gh:*)",
+      "Bash(xcopy:*)",
+      "Bash(copy \"C:\\propostasapp\\alma2026-proposta\\components\\*.tsx\" \"components\"\")",
+      "Bash(npx vercel:*)"
     ],
     "deny": []
   }
